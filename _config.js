@@ -1,9 +1,14 @@
-var config = {}
+const config = {};
 
-// Update to have your correct username and password
+const username = 'conquest';
+const password = 'db_25bumBum%23';
+const baseURI = 'mongodb+srv://conquest:db_25bumBum%23@cluster0.zksscer.mongodb.net /galery?retryWrites=true&w=majority';
+
 config.mongoURI = {
-    production: 'mongodb+srv://<USERNAME>:<PASSWORD>@gallery.wc344.mongodb.net/darkroom?retryWrites=true&w=majority',
-    development: 'mongodb+srv://<USERNAME>:<PASSWORD>@gallery.wc344.mongodb.net/darkroom-dev?retryWrites=true&w=majority',
-    test: 'mongodb+srv://<USERNAME>:<PASSWORD>@gallery.wc344.mongodb.net/darkroom-test?retryWrites=true&w=majority',
-}
+  production: baseURI,
+  development: baseURI,
+  test: baseURI
+};
+
 module.exports = config;
+
