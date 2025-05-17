@@ -1,26 +1,29 @@
-process.env.NODE_ENV = 'test';   
+const chai      = require('chai');
+const chaiHttp  = require('chai-http');
+const mongoose  = require('mongoose');
+const app       = require('../server');   
 
-var chai = require('chai');
-var chaiHttp = require('chai-http');
-
-var server = require('../server');
-var should = chai.should();
-var expect = chai.expect;
-
+const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe('Photos', function(){
+before(function (done) {
+  if (mongoose.connection.readyState === 1) return done();
+  mongoose.connection.once('open', done);
+});
 
+after(function (done) {
+  mongoose.connection.close(done);
+});
 
-    it('should list ALL photos on / GET', function(done){
-        this.timeout(60000);
-        chai.request(server)
-        .get('/')
-        .end(function(err,res){
-            res.should.have.status(200);
-            res.should.be.html;
-            res.body.should.be.a('object')
-            done();
-        })
-    });
-})
+describe('Photos', () => {
+  it('should list ALL photos on / GET', (done) => {
+    chai.request(app)          
+      .get('/')
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res).to.have.status(200);
+        expect(res.body).to.be.an('array');
+        done();
+      });
+  });
+});
