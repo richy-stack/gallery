@@ -1,27 +1,20 @@
 pipeline {
     agent any
-    tools { nodejs 'Node18' }
-
     stages {
-        stage('Install') {
+        stage('Install dependencies') {
             steps {
                 sh 'npm install'
             }
         }
-        stage('Test') {
+        stage('Run Tests') {
             steps {
                 sh 'npm test'
             }
         }
-    }
-
-    post {
-        success {
-            echo 'Build passed'
-            archiveArtifacts artifacts: 'coverage/**', allowEmptyArchive: true
-        }
-        failure {
-            echo 'Build failed'
+        stage('Archive Coverage Reports') {
+            steps {
+                archiveArtifacts artifacts: 'coverage/**', fingerprint: true
+            }
         }
     }
 }
