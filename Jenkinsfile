@@ -1,47 +1,38 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    NODE_ENV = 'development'
-  }
-
-  stages {
-    stage('Install Dependencies') {
-      steps {
-        sh 'npm install'
-      }
+    environment {
+        MONGODB_URI = credentials('MONGODB_ATLAS_URI')
+        SLACK_WEBHOOK = credentials('SLACK_WEBHOOK')
     }
 
-    stage('Run Tests') {
-      steps {
-        sh 'npm test'
-      }
-    }
+    stages {
+        stage('Install dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
 
-    stage('Deploy to Render') {
-    steps {
-        echo 'Deploying to Render...'
-        sh 'curl -X POST https://api.render.com/deploy/srv-d0o1jemmcj7s73e1299g?key=pDJb_AiDNzI'
-    }
-}
+        stage('Run tests') {
+            steps {
+                sh 'npm test'
+            }
+        }
 
+        stage('Deploy to Render') {
+            steps {
+                sh './deploy.sh'
+            }
+        }
 
-    stage('Slack Notification') {
-      steps {
-        slackSend (
-          color: '#00FF00',
-          message: "✅ Build passed: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${env.BUILD_URL}"
-        )
-      }
+        stage('Notify Slack') {
+            steps {
+                slackSend (
+                    webhookUrl: env.SLACK_WEBHOOK,
+                    message: "✅ Jenkins Pipeline: Gallery app deployed successfully!",
+                    color: '#36a64f'
+                )
+            }
+        }
     }
-  }
-
-  post {
-    failure {
-      slackSend (
-        color: '#FF0000',
-        message: "❌ Build failed: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${env.BUILD_URL}"
-      )
-    }
-  }
 }
