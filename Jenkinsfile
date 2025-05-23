@@ -21,7 +21,7 @@ pipeline {
     stage('Deploy to Render') {
       steps {
         sh '''
-          curl -X POST https://api.render.com/deploy/srv-<REPLACE_WITH_SERVICE_ID>?key=<REPLACE_WITH_API_KEY>
+          curl -X POST https://api.render.com/deploy/srv-d0o1jemmcj7s73e1299g?key=pDJb_AiDNzI
         '''
       }
     }
