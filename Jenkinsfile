@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        MONGO_URI = credentials('MONGO_URI') // your MongoDB Atlas URI from Jenkins credentials
+        MONGODB_URI = credentials('MONGODB_ATLAS_URI')
+        SLACK_WEBHOOK = credentials('SLACK_WEBHOOK')
+        MONGO_URI = credentials('MONGO_URI') 
     }
 
     stages {
@@ -20,17 +22,28 @@ pipeline {
 
         stage('Deploy to Render') {
             steps {
+                sh './deploy.sh'
                 sh 'curl -X POST "https://api.render.com/deploy/srv-d0k7j78gjchc73a6l740?key=rnd_TrJE8optGXBVX45"'
+            }
+        }
+
+        stage('Notify Slack') {
+            steps {
+                slackSend (
+                    webhookUrl: env.SLACK_WEBHOOK,
+                    message: "✅ Jenkins Pipeline: Gallery app deployed successfully!",
+                    color: '#36a64f'
+                )
             }
         }
     }
 
     post {
         success {
-            slackSend (channel: '#general', message: "✅ Jenkins pipeline completed successfully.")
+            slackSend (channel: '#all-student', message: "✅ Jenkins pipeline completed successfully.")
         }
         failure {
-            slackSend (channel: '#general', message: "❌ Jenkins pipeline failed.")
+            slackSend (channel: '#all-student', message: "❌ Jenkins pipeline failed.")
         }
     }
 }
