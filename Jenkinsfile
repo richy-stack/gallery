@@ -27,10 +27,26 @@ pipeline {
 
     post {
         success {
-            slackSend (channel: '#general', message: "✅ Jenkins pipeline completed successfully.")
+            script {
+                def slackMethod = this.metaClass.getMetaMethod('slackSend', [Map] as Object[])
+                if (slackMethod) {
+                    slackSend(channel: '#general', message: "✅ Jenkins pipeline completed successfully.")
+                } else {
+                    echo "⚠️ Slack plugin not available. Skipping Slack success notification."
+                }
+            }
         }
+
         failure {
-            slackSend (channel: '#general', message: "❌ Jenkins pipeline failed.")
+            script {
+                def slackMethod = this.metaClass.getMetaMethod('slackSend', [Map] as Object[])
+                if (slackMethod) {
+                    slackSend(channel: '#general', message: "❌ Jenkins pipeline failed.")
+                } else {
+                    echo "⚠️ Slack plugin not available. Skipping Slack failure notification."
+                }
+            }
         }
     }
 }
+
